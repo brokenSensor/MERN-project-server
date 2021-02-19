@@ -1,9 +1,27 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
+
+app.use(bodyParser.json({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
+
 const PORT = process.env.PORT || 5000;
 
-app.get('/', (req, res) => res.send('Hello World!'));
-app.listen(PORT, () => console.log(`Server is runnin on port ${PORT}`));
+mongoose
+	.connect(process.env.DATABASE_URL, {
+		useNewUrlParser: true,
+		useUnifiedTopology: true,
+	})
+	.then(() =>
+		app.listen(PORT, () => {
+			console.log(`Server is running on port ${PORT}`);
+		})
+	)
+	.catch(error => console.log(error.massage));
+
+mongoose.set('useFindAndModify', false);
